@@ -49,3 +49,11 @@ ls --size *.sqlite
 # a = 200
 # b = World\!
 ```
+
+Можно воспользоваться viewer-ом для SQLite, я предпочитаю пользоваться DBeawer. Подобных программ много, можно пользоваться теми, которые нравятся больше... но DBeawer всеядный и им удобно пользоваться при работе с различными СУБД.
+
+```bash
+wget https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
+sudo dpkg -i dbeaver-ce_latest_amd64.deb
+dbeaver
+```
