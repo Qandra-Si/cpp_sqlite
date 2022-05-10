@@ -4,8 +4,6 @@
 #include "sqlite3.h"
 
 
-static int callback(void *NotUsed, int argc, char **argv, char **azColName);
-
 int main(int argc, char **argv)
 {
   if (argc != 2)
@@ -15,6 +13,7 @@ int main(int argc, char **argv)
   }
 
   const char* db_name = "cpp_sqlite_db.sqlite";
+  //const char* db_name = ":memory:"; // <--- без файла, БД размещается в памяти
   sqlite3* handle = nullptr;
 
   if (sqlite3_open(db_name, &handle))
@@ -25,23 +24,22 @@ int main(int argc, char **argv)
   }
   std::cout << db_name << " database opened successfully!"<< std::endl;
 
+  auto print_results = [](void *, int columns, char **data, char **names) -> int{
+    for (int i = 0; i < columns; ++i)
+      std::cout << names[i] << " = " << (data[i] ? data[i] : "NULL") << std::endl;
+    std::cout << std::endl;
+    return 0;
+  };
+
   char *errmsg;
-  int rc = sqlite3_exec(handle, argv[1], callback, 0, &errmsg);
+  int rc = sqlite3_exec(handle, argv[1], print_results, 0, &errmsg);
   if (rc != SQLITE_OK)
   {
     std::cerr << "Can't execute query: " << errmsg << std::endl;
-    sqlite3_free(errmsg);
+    sqlite3_free(errmsg); // <--- обратите внимание не C-style работу с памятью
     return EXIT_FAILURE;
   }
   sqlite3_close(handle);
 
   return EXIT_SUCCESS;
-}
-
-static int callback(void *NotUsed, int argc, char **argv, char **azColName)
-{
-  for (int i = 0; i < argc; ++i)
-    std::cout << azColName[i] << " = " << (argv[i] ? argv[i] : "NULL") << std::endl;
-  std::cout << std::endl;
-  return 0;
 }
